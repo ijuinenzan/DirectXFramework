@@ -1,4 +1,3 @@
-#include <windows.h>
 #include "Graphics.h"
 
 US_CV_FRAMEWORK
@@ -8,16 +7,12 @@ HRESULT Graphics::WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
-	case WM_CLOSE:
-		DestroyWindow(hWnd);
-		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
 	default:
 		return DefWindowProc(hWnd, msg, wParam, lParam);
 	}
-	return 0;
 }
 
 Graphics::Graphics()
@@ -41,51 +36,50 @@ Graphics::Graphics(HINSTANCE hInstance, LPCSTR className, int width, int height,
 void Graphics::initWindow()
 {
 	WNDCLASSEX wc;
-
-	wc.cbSize = sizeof(WNDCLASSEX);
+	wc.cbSize = sizeof(WNDCLASSEX);//
 
 	wc.style = CS_HREDRAW | CS_VREDRAW;
-	wc.hInstance = _hInstance;
+	wc.hInstance = _hInstance;//
 
-	wc.lpfnWndProc = (WNDPROC)WinProc;
+	wc.lpfnWndProc = WinProc;//
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
 	wc.hIcon = NULL;
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
 	wc.lpszMenuName = NULL;
-	wc.lpszClassName = _windowClassName;
+	wc.lpszClassName = _windowClassName;//
 	wc.hIconSm = NULL;
 
 	RegisterClassEx(&wc);
 
-	HWND hWnd =
-		CreateWindow(
-			_windowClassName,	// Window class name
-			_windowClassName,	// Title  
-			WS_OVERLAPPEDWINDOW, 		// Window type
-			CW_USEDEFAULT,			// Initial position
-			CW_USEDEFAULT,
-			_width,				// Width
-			_height,				// Height
-			NULL,
-			NULL,
-			_hInstance,			// Program instance
-			NULL);
+	/* --- Init window --- */
+	DWORD style;
+	if (this->_isFullScreen)
+		style = WS_EX_TOPMOST | WS_VISIBLE | WS_POPUP;
+	else
+		style = WS_OVERLAPPEDWINDOW;
 
-	if (!hWnd) {
-		throw new exception("Can't create window.");
-	};
-
-	ShowWindow(hWnd, SW_SHOWNORMAL);
-	UpdateWindow(hWnd);
-
-	MSG msg;
-	while (GetMessage(&msg, NULL, 0, 0))
+	_hWnd = CreateWindow(
+		_windowClassName,
+		_windowClassName,
+		style,
+		CW_USEDEFAULT,
+		CW_USEDEFAULT,
+		_width,
+		_height,
+		NULL,
+		NULL,
+		this->_hInstance,
+		NULL);
+	if (_hWnd == NULL)
 	{
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
+		throw;
 	}
+
+	/* --- Show and Update --- */
+	ShowWindow(this->_hWnd, SW_SHOWNORMAL);
+	UpdateWindow(this->_hWnd);
 }
 
 int Graphics::isFullScreen() const

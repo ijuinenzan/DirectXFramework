@@ -3,69 +3,73 @@
 
 US_CV_FRAMEWORK
 
-GameTime::~GameTime ( )
+pGameTime GameTime::_instance = NULL;
+
+GameTime::~GameTime()
 {
 }
 
-void GameTime::release ( )
+void GameTime::release()
 {
+	SAFE_DELETE(_instance);
 }
 
-GameTime* GameTime::getInstance ( )
+GameTime* GameTime::getInstance()
 {
-	if (_instance != NULL)
+	if (_instance == NULL)
 	{
-		_instance = new GameTime();
+		_instance = new GameTime;
 	}
+
 	return _instance;
 }
 
-void GameTime::init ( )
+void GameTime::init()
 {
-	_startTick = 0;
-	_lastTick = 0;
-	_currentTick = 0;
-
 	QueryPerformanceFrequency(&_query);
-	_frequencyQuery = float(_query.QuadPart) / 10000000;
+
+	this->_frequencyQuery = float(_query.QuadPart) / 10000000;
 
 	QueryPerformanceCounter(&_query);
+	_startTick = _query.QuadPart;
 	_lastTick = _query.QuadPart;
-	_startTick = _lastTick;
-	_totalGameTime = (TimeSpan)0;
+
+	_totalGameTime = TimeSpan(0);
 }
 
-void GameTime::resetLastTick ( )
+void GameTime::resetLastTick()
 {
 	_lastTick = 0;
 	_currentTick = 0;
-	_totalGameTime = (TimeSpan)0;
+	_totalGameTime = TimeSpan(0);
 }
 
-void GameTime::updateGameTime ( )
+void GameTime::updateGameTime()
 {
 	QueryPerformanceCounter(&_query);
-
 	_currentTick = _query.QuadPart;
 
-	_elapsedGameTime = float(_currentTick - _lastTick) / _frequencyQuery;
+	if (UINT64(float(_currentTick - _lastTick) / _frequencyQuery)   <  TimeSpan::TicksPerMillisecond * 16)
+	{
+		return;
+	}
 
-
-	_totalGameTime = _totalGameTime + _elapsedGameTime;
-
+	auto gt = float(_currentTick - _lastTick) / _frequencyQuery;
+	_totalGameTime = _totalGameTime + gt;
+	_elapsedGameTime = TimeSpan(UINT64(gt));
 	_lastTick = _currentTick;
 }
 
-float GameTime::getElapsedGameTime ( ) const
+float GameTime::getElapsedGameTime() const
 {
-	return _elapsedGameTime.getMillisecond (  );
+	return _elapsedGameTime.getMillisecond();
 }
 
-float GameTime::getTotalGameTime ( ) const
+float GameTime::getTotalGameTime() const
 {
 	return _totalGameTime.getMillisecond();
 }
 
-GameTime::GameTime ( )
+GameTime::GameTime()
 {
 }

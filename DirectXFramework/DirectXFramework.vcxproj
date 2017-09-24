@@ -127,6 +127,7 @@
     <ClCompile Include="DeviceManager.cpp" />
     <ClCompile Include="GameTime.cpp" />
     <ClCompile Include="Graphics.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="TimeSpan.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
