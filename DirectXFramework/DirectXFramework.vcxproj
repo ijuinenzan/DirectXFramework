@@ -111,6 +111,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Definitions.h" />
+    <ClInclude Include="DeviceManager.h" />
+    <ClInclude Include="Graphics.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="DeviceManager.cpp" />
+    <ClCompile Include="Graphics.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
